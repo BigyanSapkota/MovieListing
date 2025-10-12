@@ -1,0 +1,118 @@
+# ============================
+# ASP.NET Core / .NET 8
+# ============================
+
+# Build folders
+bin/
+obj/
+artifacts/
+
+# User secrets and local settings
+wwwroot/credentials/
+Credentials/
+appsettings.Development.json
+appsettings.Local.json
+appsettings
+*.db
+appsettings.json
+appsettings.*.json
+*.pfx
+*.key
+*.env
+
+# Logs
+*.log
+logs/
+[Ll]og/
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+# ============================
+# Visual Studio
+# ============================
+
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Rider / JetBrains IDEs
+.idea/
+
+# NCrunch
+_NCrunch_*
+.*crunch*.local.xml
+nCrunchTemp_*
+
+# VS Code
+.vscode/
+
+# ============================
+# Web / Node / React
+# ============================
+
+node_modules/
+dist/
+wwwroot/lib/
+
+# ============================
+# Database
+# ============================
+
+*.mdf
+*.ldf
+*.ndf
+
+# ============================
+# Other generated files
+# ============================
+
+*.tmp
+*.tmp_proj
+*.bak
+*.swp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.cache
+*.coverage
+*.coveragexml
+*.dotCover
+*.ipdb
+*.iobj
+*.pch
+*.pgc
+*.pgd
+*.rsp
+*.dbmdl
+*.dbproj.schemaview
+
+# ============================
+# Backup / Temp / Misc
+# ============================
+
+_Backup*/
+UpgradeLog*.XML
+UpgradeLog*.htm
+*.rptproj.bak
+*.publishsettings
+publish/
+
+
+
+serviceAccountKey.json
+firebase-adminsdk.json
+credential.json
+credentials.json

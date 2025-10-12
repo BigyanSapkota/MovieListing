@@ -1,0 +1,282 @@
+﻿
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Notifications</title>
+    <!--<link rel="icon" type="image/x-icon" href="/favicon.ico">-->
+    <link rel="icon" href="data:,">
+
+
+
+</head>
+<body>
+    <h2> Firebase Push Notifications Test</h2>
+    <button id="notifyBtn">Request </button>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-messaging-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiATvrg8ADQfUHWoMbIVZkL1JYa85n_3M",
+            authDomain: "movielisting-66cce.firebaseapp.com",
+            projectId: "movielisting-66cce",
+            storageBucket: "movielisting-66cce.firebasestorage.app",
+            messagingSenderId: "838477265766",
+            appId: "1:838477265766:web:1bd04a3a554e47a24fa6a7"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+
+        // Register the service worker
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/firebase-messaging-sw.js")
+                .then(async (registration) => {
+                    console.log("Service Worker registered:", registration.scope);
+
+                    document.getElementById("notifyBtn").addEventListener("click", async () => {
+                        try {
+                            const permission = await Notification.requestPermission();
+                            if (permission === "granted") {
+                                console.log(" Notification permission granted.");
+
+                                const token = await messaging.getToken({
+                                    vapidKey: "BDuhkNqABRhC_fw3NGmjVj2rBiFkZpBGuziwl6mY5Bq-1CLihsRr4n39ivBkHRm1Rl7M5EbTXTHtG53bjZyW_TM",
+                                    serviceWorkerRegistration: registration,
+                                });
+                                console.log(" FCM Token:", token);
+                                //alert("Allow the Notification!");
+                            } else {
+                                console.warn("Notification permission not granted.");
+                            }
+                        } catch (error) {
+                            console.error("Error getting FCM token:", error);
+                        }
+                    });
+
+                    // Handle foreground messages
+                    messaging.onMessage((payload) => {
+                        console.log("Message received in foreground:", payload);
+                        alert(payload.notification.title + "\n" + payload.notification.body);
+                    });
+                })
+                .catch((error) => {
+                    console.error("SW registration failed:", error);
+                });
+        } else {
+            console.error("Service workers are not supported in this browser.");
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FCM Test</title>
+</head>
+<body>
+    <h1>Firebase Cloud Messaging Test</h1>
+    <button id="btn">Get FCM Token</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-messaging.js";
+
+        // Your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiATvrg8ADQfUHWoMbIVZkL1JYa85n_3M",
+            authDomain: "movielisting-66cce.firebaseapp.com",
+            projectId: "movielisting-66cce",
+            storageBucket: "movielisting-66cce.firebasestorage.app",
+            messagingSenderId: "838477265766",
+            appId: "1:838477265766:web:1bd04a3a554e47a24fa6a7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
+
+
+
+        // Request permission & get token
+        async function requestPermission() {
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === "granted") {
+                    const token = await getToken(messaging, {
+                        vapidKey: "BB8b1ok4d64RqwrHMiGLPPliFPSumTN94bMfwRLAId-x4cqED6_kiu0fnHTEVmwVEyE_eZsMjMXTobtTNT1WadQ"
+                    });
+                    console.log(" FCM Token:", token);
+                    // You can also expose it globally if you want
+                    window.fcmToken = token;
+                } else {
+                    console.log(" Permission not granted");
+                }
+            } catch (err) {
+                console.error("Error getting token:", err);
+            }
+        }
+
+        requestPermission();
+
+        requestPermission();
+
+        // Foreground messages
+        onMessage(messaging, (payload) => {
+            console.log("Message received in foreground: ", payload);
+        });
+
+
+
+    </script>
+</body>
+</html>-->
+<!--<!DOCTYPE html>
+<html>
+<head>
+    <title>FCM Test</title>
+</head>
+<body>
+    <button id="btn">Get FCM Token</button>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-messaging.js";
+
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDiATvrg8ADQfUHWoMbIVZkL1JYa85n_3M",
+            authDomain: "movielisting-66cce.firebaseapp.com",
+            projectId: "movielisting-66cce",
+            storageBucket: "movielisting-66cce.firebasestorage.app",
+            messagingSenderId: "838477265766",
+            appId: "1:838477265766:web:1bd04a3a554e47a24fa6a7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
+
+        //async function registerToken() {
+        //    try {
+        //        const currentToken = await getToken(messaging, { vapidKey: "BD8VxezwBsB-8MmaIvah1TyddZJfTUiE3GvXFkDwV6Z0j0sCRQxxKfaRIkW7Kg8ozxOp4_M5ZNLz7yzcNj3pPs4" });
+        //        console.log("FCM Token:", currentToken);
+
+        //        // send token to backend API
+        //        await fetch("https://localhost:7160/api/WebPush/register", {
+        //            method: "POST",
+        //            headers: { "Content-Type": "application/json" },
+        //            body: JSON.stringify({
+        //                UserId: 1,
+        //                Token: currentToken,
+        //                Platform: "Web"
+        //            })
+        //        });
+        //        alert("Token registered successfully!");
+        //    } catch (err) {
+        //        console.error("Error getting FCM token:", err);
+        //    }
+        //}
+
+        //registerToken();
+
+        // Register service worker
+        navigator.serviceWorker.register("/firebase-messaging-sw.js").then(async (registration) => {
+            const token = await getToken(messaging, {
+                vapidKey: "BJDpWq9qdJ4Ca481ujQ78wyilr_lH2Gh4h2CJlGGVIkrrgKm1egapz4qZc8Jf0OHpmMAemfTUCLKSc5BN0OlGIk",
+                serviceWorkerRegistration: registration,
+            });
+            console.log("FCM Token:", token);
+        }).catch((err) => {
+            console.error("Error getting FCM token:", err);
+        });
+
+        // Handle foreground messages
+        onMessage(messaging, (payload) => {
+            console.log("Message received in foreground:", payload);
+            alert(`Notification: ${payload.notification.title} - ${payload.notification.body}`);
+        });
+
+
+
+    </script>
+</body>
+
+</html>-->
