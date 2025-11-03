@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using Shared.Common;
 using Shared.Helper;
 
@@ -264,6 +263,7 @@ namespace Application.Service
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
 
 
 

@@ -35,9 +35,11 @@ namespace Application.Service
         private readonly IMovieNotificationJob _notificationJob;
         private readonly IPushNotificationService _pushNotification;
         private readonly IDeviceTokenRepo _deviceTokenRepo;
+        private readonly IDeleteRequestService _deleteRequestService;
         public MovieService(IMovieRepo movieRepo, IMapper mapper, IGenericRepo<Movie,Guid> movieRepoo, IUnitOfWork unitOfWork,
                             IGenericRepo<Genre, Guid> genreRepo, IGenericRepo<Language, Guid> languageRepo, IConfiguration configuration,
-                           UploadToDrive uploadToDrive, EmailHelper emailHelper,IMovieNotificationJob notificationJob,IPushNotificationService pushNotification,IDeviceTokenRepo deviceTokenRepo)
+                           UploadToDrive uploadToDrive, EmailHelper emailHelper,IMovieNotificationJob notificationJob,IPushNotificationService pushNotification,
+                           IDeviceTokenRepo deviceTokenRepo, IDeleteRequestService deleteRequestService)
         {
             _mapper = mapper;
             _movieRepoo = movieRepoo;
@@ -51,6 +53,7 @@ namespace Application.Service
             _notificationJob = notificationJob;
             _pushNotification = pushNotification;
             _deviceTokenRepo = deviceTokenRepo;
+            _deleteRequestService = deleteRequestService;
         }
 
 
@@ -63,6 +66,10 @@ namespace Application.Service
             movie.Id = Guid.NewGuid();
             movie.CreatedBy = loginuser;
             movie.CreatedAt = DateTime.Now;
+            if (loginuser == null)
+                throw new UnauthorizedAccessException("You cannot add movie");
+            if (movieDto == null)
+                throw new ArgumentException("Movie data must be added");
 
             ////////---------Uploading Poster to Google Drive-------------------////////
 
@@ -208,26 +215,38 @@ namespace Application.Service
 
         public async Task<ResponseData<MovieDto>> DeleteMovieAsync(Guid id,string loginuser)
         {
-            var data = await _movieRepoo.GetByIdAsync(id);
-            data.Data.DeletedBy = loginuser;
-            data.Data.DeletedAt = DateTime.Now;
-
-            if (data.Data == null || data.Data.CreatedBy != loginuser)
+            var existRequest = await _deleteRequestService.GetRequestByMovie(id);
+            if( existRequest != null)
             {
-                return new ResponseData<MovieDto> { Success = false, Message = "You Cannot Delete" };
+                throw new ArgumentException("Movie Delete Request Already Exists !");
             }
+            var result = await _deleteRequestService.CreateDeleteRequestAsync(id, loginuser);
 
-            var result = await _movieRepoo.DeleteAsync(data.Data);
-            if (result.Success == true || result.Data != null)
+            //var data = await _movieRepoo.GetByIdAsync(id);
+
+            //if (data == null)
+            //    throw new KeyNotFoundException("Movie not found");
+            //data.Data.DeletedBy = loginuser;
+            //data.Data.DeletedAt = DateTime.Now;
+
+            //if (data.Data == null || data.Data.CreatedBy != loginuser)
+            //{
+            //    throw new UnauthorizedAccessException("You are not authorize to delete");
+            //}
+
+            //var result = await _movieRepoo.DeleteAsync(data.Data);
+
+            if (result != null)
             {
-                await _unitOfWork.CommitAsync(); 
+                await _unitOfWork.CommitAsync();
                 return new ResponseData<MovieDto>
                 {
                     Success = true,
-                    Message = result.Message
+                    Message = "Delete Request Created Successfully",
                 };
             }
-            return new ResponseData<MovieDto> { Success = false, Message = result.Message };
+
+            return new ResponseData<MovieDto> { Success = false, Message = "Delete Request Cannot be Created " };
 
         }
 
@@ -238,6 +257,10 @@ namespace Application.Service
         public async Task<ResponseData<PageResult<MovieShowDto>>> GetAllMoviesAsync(int pageNumber,int pageSize)
         {
             var pagedResult = await _movieRepo.GetAllMovies(pageNumber, pageSize);
+            if (pagedResult.Data.Items.Count == 0)
+            {
+                throw new KeyNotFoundException("Movie Not Found");
+            }
 
             var pagedResultDto = new PageResult<MovieShowDto>
             {

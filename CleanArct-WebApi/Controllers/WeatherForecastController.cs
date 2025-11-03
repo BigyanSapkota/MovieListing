@@ -25,8 +25,8 @@ namespace CleanArct_WebApi.Controllers
         public IEnumerable<WeatherForecast> Get()
         {
             var userId = User.Identity?.Name ?? "Anonymous";
-            _logger.LogInformation("User {UserId} requested weather", userId);
-            _logger.LogInformation("This is an info log at {time}", DateTime.Now);
+            //_logger.LogInformation("User {UserId} requested weather", userId);
+            //_logger.LogInformation("This is an info log at {time}", DateTime.Now);
 
 
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
@@ -39,5 +39,34 @@ namespace CleanArct_WebApi.Controllers
             .ToArray();
 
         }
+
+
+
+        [HttpGet("notfound")]
+        public IActionResult GetNotFound()
+        {
+            throw new KeyNotFoundException("The requested resource was not found.");
+        }
+
+        [HttpGet("unauthorized")]
+        public IActionResult GetUnauthorized()
+        {
+            throw new UnauthorizedAccessException("You are not authorized to access this resource.");
+        }
+
+        [HttpGet("badrequest")]
+        public IActionResult GetBadRequest()
+        {
+            throw new ArgumentException("Invalid argument provided.");
+        }
+
+        [HttpGet("ok")]
+        public IActionResult GetOk()
+        {
+            return Ok(new { message = "No exception, all good ?" });
+        }
+
+
+
     }
 }

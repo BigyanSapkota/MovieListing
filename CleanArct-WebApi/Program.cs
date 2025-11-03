@@ -1,7 +1,10 @@
+using System.Net;
+using System.Text.Json;
 using Application.Interface;
 using Application.Interface.Repository;
 using Application.Interface.Services;
 using Application.Service;
+using CleanArct_WebApi.Exception;
 using Domain.Entities;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -11,12 +14,15 @@ using Infrastructure.Data;
 using Infrastructure.Dependency;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Shared.Helper;
+using static CleanArct_WebApi.Exception.ExceptionHandling;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -129,6 +135,36 @@ builder.Services.AddInfrastructureService();
 
 
 
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(x => x.Value.Errors.Count > 0)
+            .ToDictionary(
+                x => x.Key,
+                x => x.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+            );
+
+        var response = new ExceptionResponse
+        {
+            StatusCode = StatusCodes.Status400BadRequest,
+            Description = "Error Occurs",
+            Errors = errors,
+            Path = context.HttpContext.Request.Path,
+            Timestamp = DateTime.UtcNow
+        };
+
+        return new BadRequestObjectResult(response);
+    };
+});
+
+
+
+
+
+
+
 var app = builder.Build();
 
 
@@ -145,6 +181,53 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+
+
+//app.UseExceptionHandler(errorApp =>
+//{
+//    errorApp.Run(async context =>
+//    {
+//        context.Response.ContentType = "application/json";
+//        var feature = context.Features.Get<IExceptionHandlerFeature>();    // Retrieves the exception information
+
+//        if (feature != null)
+//        {
+//            var ex = feature.Error;        
+//            int statusCode = (int)HttpStatusCode.InternalServerError;
+
+//            if (ex is UnauthorizedAccessException)
+//                statusCode = (int)HttpStatusCode.Unauthorized; 
+//            else if (ex is ArgumentException)
+//                statusCode = (int)HttpStatusCode.BadRequest;   
+//            else if (ex is KeyNotFoundException)
+//                statusCode = (int)HttpStatusCode.NotFound;     
+//            else if (ex is NotImplementedException)
+//                statusCode = (int)HttpStatusCode.NotImplemented; 
+
+//            context.Response.StatusCode = statusCode;
+
+//            var result = JsonSerializer.Serialize(new
+//            {
+//                StatusCode = statusCode,
+//                Message = ex.Message,
+//                ErrorType = ex.GetType().Name,
+//                Path = context.Request.Path
+//            });
+
+//            await context.Response.WriteAsync(result);
+//        }
+//    });
+//});
+
+
+
+
+
+
+
+
+app.UseMiddleware<ExceptionHandling>();
 
 app.UseAuthentication();
 app.UseAuthorization();

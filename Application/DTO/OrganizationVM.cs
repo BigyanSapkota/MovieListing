@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Entities
+namespace Application.DTO
 {
-     public class Organization
+     public class OrganizationVM
     {
-        public Guid Id { get; set; }
         public string Name { get; set; } = null!;
         public string ContactEmail { get; set; } = null!;
         public string ContactPhone { get; set; } = null!;
@@ -16,8 +15,5 @@ namespace Domain.Entities
 
         public string SecretKey { get; set; } = null!;
         public int shouldApprovedBy { get; set; }
-
-        public ICollection<User> Users { get; set; } = new List<User>();
-        public ICollection<PaymentTransaction> PaymentTransaction { get; set; } = new List<PaymentTransaction>();
     }
 }

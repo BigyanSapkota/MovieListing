@@ -4,6 +4,8 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Google.Apis.Drive.v3.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Shared.Helper
 {
@@ -37,6 +39,18 @@ namespace Shared.Helper
                                          Encoding.UTF8.GetBytes(generatedSignature),
                                           Encoding.UTF8.GetBytes(providedSignature));
         }
+
+
+        public static string GenerateDV(string MerchantCode,string MD,string refrenceNumber,decimal amount,string currencyCode, string date, string r1, string r2, string returnUrl,string SecretKey)
+        {
+            var dataToHash = $"{MerchantCode},{MD},{refrenceNumber},{amount},{currencyCode},{date},{r1},{r2},{returnUrl},{SecretKey}";
+            using var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(SecretKey));
+            byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(dataToHash));
+            return Convert.ToBase64String(hash);
+        }
+            
+
+
 
     }
 }

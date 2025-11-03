@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251029081015_Delete-Request-Approve")]
+    partial class DeleteRequestApprove
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -526,9 +529,6 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("shouldApprovedBy")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Organizations");
@@ -1010,7 +1010,7 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.DeleteApproval", b =>
                 {
                     b.HasOne("Domain.Entities.DeleteRequest", "DeleteRequest")
-                        .WithMany("Approval")
+                        .WithMany("Approvals")
                         .HasForeignKey("DeleteRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1210,7 +1210,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.DeleteRequest", b =>
                 {
-                    b.Navigation("Approval");
+                    b.Navigation("Approvals");
                 });
 
             modelBuilder.Entity("Domain.Entities.Genre", b =>

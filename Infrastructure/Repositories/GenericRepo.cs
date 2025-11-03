@@ -40,15 +40,15 @@ namespace Infrastructure.Repositories
 
         public Task<ResponseData<T>> DeleteAsync(T entity)
         {
+            _context.Attach(entity);
             entity.IsActive= false;
             _context.Entry(entity).State = EntityState.Modified;
-         return Task.FromResult(new ResponseData<T>
+            return Task.FromResult(new ResponseData<T>
             {
                 Success = true,
                 Message = "Entity deleted successfully",
                 Data = entity
             });
-
         }
 
 

@@ -50,7 +50,7 @@ namespace CleanArct_WebApi.Controllers
                 var reply = await _openAIService.GetResponseAsync(request.Message);
                 return Ok(new ChatResponse { Reply = reply });
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return BadRequest(new { error = ex.Message });
             }

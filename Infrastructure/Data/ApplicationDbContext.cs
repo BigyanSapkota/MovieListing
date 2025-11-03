@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Shared.Helper;
+using Twilio.TwiML.Voice;
 
 namespace Infrastructure.Data
 {
@@ -34,7 +35,17 @@ namespace Infrastructure.Data
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             applyToAll();
-            return await base.SaveChangesAsync(cancellationToken);
+            //return await base.SaveChangesAsync(cancellationToken);
+            try
+            {
+                return await base.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($" SaveChangesAsync Error: {ex.Message}");
+                Console.WriteLine($" Inner: {ex.InnerException?.Message}");
+                throw; 
+            }
         }
 
 
@@ -75,7 +86,7 @@ namespace Infrastructure.Data
         public DbSet<Rating> Rating { get; set; }
         public DbSet<Genre> Genre { get; set; }
         public DbSet<MovieGenre> MovieGenre { get; set; }
-        public DbSet<Language> Language { get; set; }
+        public DbSet<Domain.Entities.Language> Language { get; set; }
         public DbSet<MovieLanguage> MovieLanguage { get; set; }
         public DbSet<GoogleUser> GoogleUser { get; set; }
         public DbSet<WatchList> WatchList { get; set; }
@@ -91,7 +102,8 @@ namespace Infrastructure.Data
 
         public DbSet<Notification> Notification { get; set; }
         public DbSet<SMS> SMS { get; set; }
-
+        public DbSet<DeleteRequest> DeleteRequest { get; set; }
+        public DbSet<DeleteApproval> DeleteApproval { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -110,11 +122,11 @@ namespace Infrastructure.Data
 
 
 
-           //builder.Entity<UserOtp>()
-           //    .HasOne(uo => uo.user)
-           //    .WithMany() 
-           //    .HasForeignKey(uo => uo.userId)
-           //    .IsRequired();
+            //builder.Entity<UserOtp>()
+            //    .HasOne(uo => uo.user)
+            //    .WithMany() 
+            //    .HasForeignKey(uo => uo.userId)
+            //    .IsRequired();
 
 
 
@@ -127,8 +139,8 @@ namespace Infrastructure.Data
 
 
             builder.Entity<Comment>()
-                .HasOne(c=> c.User)
-                .WithMany(u=> u.Comment)
+                .HasOne(c => c.User)
+                .WithMany(u => u.Comment)
                 .HasForeignKey(c => c.CreatedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -150,14 +162,14 @@ namespace Infrastructure.Data
                 .HasOne(mg => mg.Movie)
                 .WithMany(m => m.MovieGenre)
                 .HasForeignKey(mg => mg.MovieId);
-            
+
             builder.Entity<MovieGenre>()
                 .HasOne(mg => mg.Genre)
                 .WithMany(g => g.MovieGenre)
                 .HasForeignKey(mg => mg.GenreId);
 
             builder.Entity<MovieGenre>()
-                .HasKey(mg => new {mg.MovieId, mg.GenreId });
+                .HasKey(mg => new { mg.MovieId, mg.GenreId });
 
 
             builder.Entity<MovieLanguage>()
@@ -181,34 +193,34 @@ namespace Infrastructure.Data
                 .HasPrincipalKey(u => u.Id)          // PK in User
                 .OnDelete(DeleteBehavior.Restrict);
 
-            
-           builder.Entity<WatchList>()
-                .HasOne(w => w.User)
-                .WithMany(u => u.WatchList)
-                .HasForeignKey(w => w.UserId)
-                .HasPrincipalKey(u => u.Id)
-                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WatchList>()
+                 .HasOne(w => w.User)
+                 .WithMany(u => u.WatchList)
+                 .HasForeignKey(w => w.UserId)
+                 .HasPrincipalKey(u => u.Id)
+                 .OnDelete(DeleteBehavior.Cascade);
 
 
             builder.Entity<WatchList>()
                 .HasOne(w => w.Movie)
                 .WithMany(m => m.WatchList)
                 .HasForeignKey(w => w.MovieId)
-                .HasPrincipalKey(m => m.Id) 
+                .HasPrincipalKey(m => m.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
 
             builder.Entity<WaterBill>()
               .HasOne(w => w.User)
-             .WithMany(u => u.WaterBill)   
+             .WithMany(u => u.WaterBill)
              .HasForeignKey(w => w.UserId)
              .OnDelete(DeleteBehavior.Restrict);
 
-     
-           
-           builder.Entity<WaterBill>()
-                  .Property(w => w.Amount)
-                  .HasColumnType("decimal(9,2)");
+
+
+            builder.Entity<WaterBill>()
+                   .Property(w => w.Amount)
+                   .HasColumnType("decimal(9,2)");
 
 
             builder.Entity<ElectricityBill>()
@@ -245,11 +257,19 @@ namespace Infrastructure.Data
                 .HasForeignKey(u => u.OrganizationId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<DeleteRequest>()
+                .HasMany(dr => dr.Approval)
+                .WithOne(da => da.DeleteRequest)
+                .HasForeignKey(da => da.DeleteRequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<DeleteApproval>()
+                .HasKey(da => da.ApprovalId);
+
+
+
 
         }
-
-
-
 
 
 

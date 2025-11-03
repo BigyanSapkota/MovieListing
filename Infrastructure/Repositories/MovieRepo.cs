@@ -202,6 +202,51 @@ namespace Infrastructure.Repositories
             };
         }
 
-        
+        public async Task DeleteAsync(Guid movieId,string requestedByAdminId)
+        {
+            //movie.IsActive = false;
+            //await _context.SaveChangesAsync();
+            await _context.Movies.Where(m => m.Id == movieId)
+                                 .ExecuteUpdateAsync(m => m.SetProperty(p => p.IsActive, false)
+                                 .SetProperty(p => p.DeletedBy, requestedByAdminId)
+                                 .SetProperty(p => p.DeletedAt, DateTime.Now));
+        }
+
+
+        public async Task<ResponseData<Movie>> GetMovieByIdAsync(Guid movieId)
+        {
+            var data = await _context.Movies.Include(m => m.MovieGenre).ThenInclude(mg => mg.Genre)
+                                    .Include(m => m.MovieLanguage).ThenInclude(ml => ml.Language)
+                                    .FirstOrDefaultAsync(m => m.Id == movieId && m.IsActive);
+
+            if (data == null)
+            {
+                return new ResponseData<Movie>
+                {
+                    Success = false,
+                    Message = "Movie not found",
+                    Data = null
+                };
+            }
+
+
+
+            return new ResponseData<Movie>
+            {
+                Success = true,
+                Message = "Movie retrieved successfully",
+                Data = data
+            };
+        }
+
+
+        public async Task Update(Movie movie)
+        {
+            _context.Movies.Update(movie);
+            await _context.SaveChangesAsync();
+        }
+
+
+
     }
 }

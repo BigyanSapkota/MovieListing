@@ -47,7 +47,7 @@ namespace CleanArct_WebApi.Controllers
                 await _pushService.SendNotificationAsync(request.Token,request.Title, request.Body);
                 return Ok("Notifications sent");
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
@@ -62,7 +62,7 @@ namespace CleanArct_WebApi.Controllers
                 await _pushService.SendNotificationsToMultipleUsersAsync(request.Tokens, request.Title, request.Body);
                 return Ok("Notifications sent");
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }

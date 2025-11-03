@@ -8,6 +8,7 @@ using Application.Interface.Repository;
 using Application.Interface.Services;
 using Application.Service;
 using Infrastructure.Repositories;
+using Infrastructure.Service;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Helper;
 
@@ -84,6 +85,7 @@ namespace Infrastructure.Dependency
 
             Services.AddScoped<IKhaltiPaymentService, KhaltiPaymentService>();
             Services.AddScoped<IEsewaPaymentService, EsewaPaymentService>();
+            Services.AddScoped<IFonePayService, FonePayService>();
 
 
 
@@ -102,7 +104,11 @@ namespace Infrastructure.Dependency
 
             Services.AddScoped<VonageSMSService>();
 
-            
+            Services.AddScoped<IDeleteRequestRepo, DeleteRequestRepo>();
+            Services.AddScoped<IDeleteRequestService, DeleteRequestService>();
+
+            Services.AddScoped<IOrganizationService, OrganizationService>();
+            Services.AddScoped<IOrganizationRepo, OrganizationRepo>();
 
 
 

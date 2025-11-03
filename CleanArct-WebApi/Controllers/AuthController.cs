@@ -38,7 +38,6 @@ public class AuthController : ControllerBase
             
             var registerDto = new RegisterDto
             {
-               
                 UserName = model.UserName,
                 Email = model.Email,
                 Password = model.Password,

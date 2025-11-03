@@ -16,7 +16,9 @@ namespace Application.Interface.Repository
         public Task<ResponseData<List<MovieShowDto>>> GetMovieByFilterAsync(MovieFilterDto filterDto);
         public Task<ResponseData<MovieDto>> GetById(Guid movieId);
         public Task<ResponseData<PageResult<MovieShowDto>>> GetAllMovies(int pageNumber, int pageSize);
-
+        public Task DeleteAsync(Guid movieId, string requestedByAdminId);
+        public Task<ResponseData<Movie>> GetMovieByIdAsync(Guid movieId);
+        Task Update(Movie movie);
 
     }
 }

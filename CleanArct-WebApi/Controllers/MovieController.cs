@@ -50,6 +50,7 @@ namespace CleanArct_WebApi.Controllers
         }
 
 
+
         [Authorize(Roles = ("Admin"))]
         [HttpDelete("Delete-Movie/{id}")]
         public async Task<IActionResult> DeleteMovie(Guid id)
@@ -60,8 +61,9 @@ namespace CleanArct_WebApi.Controllers
             {
                 return Ok(response.Message);
             }
-            return BadRequest("Cannot Delete");
+            return BadRequest("Cannot Request Delete");
         }
+
 
 
 
@@ -171,7 +173,7 @@ namespace CleanArct_WebApi.Controllers
 
                 return Ok("Email sent successfully.");
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 return BadRequest($"Error sending email: {ex.Message}");
 
