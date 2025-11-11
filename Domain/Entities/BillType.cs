@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities
 {
@@ -14,6 +15,7 @@ namespace Domain.Entities
 
         public int interval { get; set; }
         public  bool IsFixedAmount { get; set; }
+        [Precision(18,2)]
         public decimal DefaultAmount { get; set; }
         // Navigation property
         [JsonIgnore]

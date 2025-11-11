@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities
 {
@@ -13,6 +14,7 @@ namespace Domain.Entities
         public User User { get; set; } = null!;
 
         public List<Guid> BillIds { get; set; } = new List<Guid>();
+        [Precision(18,2)]
         public decimal TotalAmount { get; set; }
         public string Status { get; set; }  // Pending / Completed / Failed
         public string Pidx { get; set; } = null!; // Khalti payment token / reference

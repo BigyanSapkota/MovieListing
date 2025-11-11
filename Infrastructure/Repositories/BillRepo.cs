@@ -31,7 +31,9 @@ namespace Infrastructure.Repositories
 
         public async Task<List<Bill>> GetAllUnpaidBillAsync(string userId)
         {
-           return await _context.Bills.Include(b => b.BillType).Where(x => x.UserId == userId && !x.IsPaid).ToListAsync();
+   
+           return await _context.Bills.Include(b => b.BillType).Where(x => x.UserId == userId && x.IsPaid == false  ).ToListAsync();
+         
         }
 
         public async Task<Bill> GetBillByIdAsync(Guid billId)

@@ -16,6 +16,7 @@ namespace Application.Interface.Services
         Task<Bill> CreateAsync(CreateBill billDto);
         Task<Bill> UpdateAsync(BillDTO billDto);
         Task<Guid> DeleteAsync(Guid id);
-        Task<List<CreateBill>> GenerateNextBillsAsync(string userId);
+        Task<BillSummaryDto> GenerateNextBillsAsync(string userId);
+        Task<IEnumerable<CreateBill>> GetUnpaidUserBill(string userId);
     }
 }

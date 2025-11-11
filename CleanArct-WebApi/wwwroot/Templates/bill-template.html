@@ -1,0 +1,207 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Invoice / Bill</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+        /* A4 sizing for print */
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        html, body {
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #222;
+        }
+
+        .invoice {
+            width: 210mm; /* A4 width */
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 10mm;
+            box-sizing: border-box;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .company {
+            text-align: left;
+        }
+
+            .company h1 {
+                margin: 0;
+                font-size: 20px;
+                color: #0b5ed7;
+            }
+
+            .company .sub {
+                font-size: 12px;
+                color: #555;
+            }
+
+        .meta {
+            text-align: right;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .bill-to {
+            margin-top: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+            .bill-to .to {
+                max-width: 60%;
+            }
+
+        .details {
+            margin-top: 14px;
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 13px;
+        }
+
+            .details th, .details td {
+                padding: 8px 10px;
+                border-bottom: 1px solid #e6e6e6;
+                text-align: left;
+            }
+
+            .details th {
+                background: #f3f6fb;
+                font-weight: 600;
+                font-size: 13px;
+            }
+
+        .totals {
+            margin-top: 12px;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+            .totals table {
+                width: 320px;
+                border-collapse: collapse;
+                font-size: 13px;
+            }
+
+            .totals td {
+                padding: 6px 8px;
+                border-bottom: 1px dotted #ddd;
+            }
+
+            .totals tr.total-row td {
+                font-weight: 700;
+                font-size: 15px;
+                border-top: 2px solid #333;
+            }
+
+        footer {
+            margin-top: 18px;
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            border-top: 1px dashed #e0e0e0;
+            padding-top: 8px;
+        }
+
+        /* Make sure the layout prints properly */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+            }
+
+            .invoice {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice">
+        <header>
+            <div class="company">
+                <h1>Acme Apartments</h1>
+                <div class="sub">Kumaripati, Lalitpur • Phone: +977-01-XXXXXXX</div>
+            </div>
+            <div class="meta">
+                <div><strong>Invoice #:</strong> <span id="invoiceNumber">INV-2025-0001</span></div>
+                <div><strong>Date:</strong> <span id="invoiceDate">2025-11-09</span></div>
+            </div>
+        </header>
+
+        <section class="bill-to">
+            <div class="to">
+                <strong>Bill To:</strong>
+                <div id="customerName">Mr. Ram Shrestha</div>
+                <div id="customerAddress">Ward No. X, Kathmandu</div>
+                <div id="customerPhone">+977-98XXXXXXXX</div>
+            </div>
+            <div class="summary">
+                <div><strong>Due Date:</strong> <span id="dueDate">2025-11-20</span></div>
+                <div><strong>Unit:</strong> A-102</div>
+            </div>
+        </section>
+
+        <table class="details" cellspacing="0" cellpadding="0">
+            <thead>
+                <tr>
+                    <th style="width:60%">Description</th>
+                    <th style="width:15%; text-align:right">Qty</th>
+                    <th style="width:12%; text-align:right">Unit Price</th>
+                    <th style="width:13%; text-align:right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Monthly Rent (Nov 2025)</td>
+                    <td style="text-align:right">1</td>
+                    <td style="text-align:right">15,000.00</td>
+                    <td style="text-align:right">15,000.00</td>
+                </tr>
+                <tr>
+                    <td>Service Charge</td>
+                    <td style="text-align:right">1</td>
+                    <td style="text-align:right">500.00</td>
+                    <td style="text-align:right">500.00</td>
+                </tr>
+                <!-- Add more rows dynamically -->
+            </tbody>
+        </table>
+
+        <div class="totals">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Subtotal</td>
+                        <td style="text-align:right">15,500.00</td>
+                    </tr>
+                    <tr>
+                        <td>Tax (0%)</td>
+                        <td style="text-align:right">0.00</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Total</td>
+                        <td style="text-align:right">15,500.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer>
+            Thank you for your payment. For queries: accounts@acme.com
+        </footer>
+    </div>
+</body>
+</html>

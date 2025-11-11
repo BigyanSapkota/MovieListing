@@ -71,5 +71,16 @@ namespace CleanArct_WebApi.Controllers
         }
 
 
+        [HttpGet("Unpaid-Bill-User")]
+        public async Task<IActionResult> GetUnpaidUserBill(string userId)
+        {
+            var result = await _billService.GetUnpaidUserBill(userId);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            return BadRequest("Not found");
+        }
+
     }
 }

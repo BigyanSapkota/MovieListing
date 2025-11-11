@@ -110,6 +110,8 @@ namespace Infrastructure.Dependency
             Services.AddScoped<IOrganizationService, OrganizationService>();
             Services.AddScoped<IOrganizationRepo, OrganizationRepo>();
 
+            Services.AddScoped<IPdfService, PdfService>();
+            Services.AddScoped<IPdfGenerateService, PdfGenerateService>();
 
 
             return Services;

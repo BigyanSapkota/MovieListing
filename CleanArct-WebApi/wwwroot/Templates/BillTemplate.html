@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @page{
+            size : A4;
+            margin : 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin : 0px;
+            padding: 0px;
+            background-color: #f4f6f8;
+            color: #333;
+            -webkit-print-color-adjust:exact;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2mm 2mm;
+            background-color: #fff;
+            padding: 25px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid #988f8f;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+            .header img {
+                max-width: 120px;
+                margin-bottom: 10px;
+            }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f3c88;
+            margin-bottom: 5px;
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #e0e0e0;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+            font-size: 13px;
+            line-height: 1.2;
+        }
+
+            table thead {
+                background-color: #1f3c88;
+                color: #fff;
+            }
+
+            table th, table td {
+                padding: 4px 8px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+                font-size: 10px;
+            }
+
+            table tbody tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+
+        h3 {
+            color: #1f3c88;
+            margin-top: 25px;
+        }
+
+        .generation-date {
+            text-align: right;
+            font-style: italic;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2 class="title">Apartment Bill</h2>
+        </div>
+
+        <div class="user-info">
+            <p><b>Name:</b> {UserFullName}</p>
+            <p><b>Email:</b> {UserEmail}</p>
+            <p><b>Phone:</b> {UserPhone}</p>
+            <p><b>Organization:</b> {org} </p>
+        </div>
+
+        <hr />
+
+        <p><b>Billing :</b> {BillingMonth}/{BillingYear}</p>
+        <!--<p><b>Billing Year:</b> {BillingYear}</p>-->
+
+        <hr />
+
+        <h3>Previous Unpaid Bills</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Bill Type</th>
+                    <th>Total Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {PreviousBill}
+            </tbody>
+        </table>
+        
+
+        <h3>Newly Generated Bills</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Bill Type</th>
+                    <th>Total Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {NewBill}
+            </tbody>
+        </table>
+        
+
+
+        <h3>Net Total </h3>
+        <table>
+            <tbody>
+                {Totals}
+            </tbody>
+        </table>
+
+
+        <div class="generation-date">
+            <p><b>Bill Generated Date:</b> {GenerationDate}</p>
+        </div>
+    </div>
+</body>
+</html>
+
+

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.DTO;
+using Application.DTO.Payment;
 using Application.Interface;
 using Application.Interface.Repository;
 using Application.Interface.Services;
@@ -15,14 +16,14 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace Application.Service
 {
-     public class BillService : IBillService
+    public class BillService : IBillService
     {
         private readonly IBillRepo _billRepo;
         private readonly IBillTypeRepo _billTypeRepo;
         private readonly IGenericRepo<Bill, Guid> _genericRepo;
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<User> _userManager;
-        public BillService(IBillRepo billRepo, IGenericRepo<Bill, Guid> genericRepo,IUnitOfWork unitOfWork, IBillTypeRepo billTypeRepo,UserManager<User> userManager)
+        public BillService(IBillRepo billRepo, IGenericRepo<Bill, Guid> genericRepo, IUnitOfWork unitOfWork, IBillTypeRepo billTypeRepo, UserManager<User> userManager)
         {
             _billRepo = billRepo;
             _genericRepo = genericRepo;
@@ -35,7 +36,7 @@ namespace Application.Service
 
         public async Task<Bill> CreateAsync(CreateBill billDto)
         {
-           var bill = new Bill
+            var bill = new Bill
             {
                 //Id = Guid.NewGuid(),
                 BillTypeId = billDto.BillTypeId,
@@ -56,7 +57,7 @@ namespace Application.Service
             throw new NotImplementedException();
         }
 
-      
+
 
         public async Task<IEnumerable<BillDTO>> GetAllAsync()
         {
@@ -116,7 +117,7 @@ namespace Application.Service
 
         public async Task<Bill> UpdateAsync(BillDTO billDto)
         {
-           var bill = new Bill
+            var bill = new Bill
             {
                 Id = billDto.Id,
                 BillTypeId = billDto.BillTypeId,
@@ -136,14 +137,62 @@ namespace Application.Service
 
 
 
-        public async Task<List<CreateBill>> GenerateNextBillsAsync(string userId)
+
+        public async Task<BillSummaryDto> GenerateNextBillsAsync(string userId)
         {
+
+
+            var previousMonthBills = new List<CreateBill>();
+
+            var oldBills = await _billRepo.GetAllUnpaidBillAsync(userId);
+
+
+            DateTime now = DateTime.Now;
+            int year = now.Year;
+            int month = now.Month;
+
+            // Filter previous months only
+            var previousBills = oldBills
+                .Where(b => b.CreatedAt.HasValue &&
+                            (b.CreatedAt.Value.Year < year ||
+                             (b.CreatedAt.Value.Year == year && b.CreatedAt.Value.Month < month)))
+                .ToList();
+
+            // Group by BillTypeId and sum
+            var allPreviousBill = previousBills
+                .GroupBy(b => b.BillTypeId)
+                .Select(x => new
+                {
+                    BillTypeId = x.Key,
+                    BillTypeName = x.First().BillType.Name,
+                    TotalAmount = x.Sum(b => b.TotalAmount)
+                }).ToList();
+
+
+            foreach (var prev in allPreviousBill)
+            {
+                previousMonthBills.Add(new CreateBill
+                {
+                    BillTypeId = prev.BillTypeId,
+                    BillTypeName = prev.BillTypeName,
+                    UserId = userId,
+                    TotalAmount = prev.TotalAmount
+                });
+            }
+
+
+            
+
+            var newMonthBills = new List<CreateBill>();
+
             var billTypes = await _billTypeRepo.GetAllBillType();
-            var generatedBills = new List<CreateBill>();
+
             foreach (var billType in billTypes)
             {
                 var latestBill = await _billRepo.GetLatestBillAsync(userId, billType.Id);
                 Bill newBill = null;
+                CreateBill billDetails = null;
+                
                 if (latestBill == null)
                 {
                     newBill = new Bill
@@ -158,8 +207,14 @@ namespace Application.Service
 
                     await _genericRepo.AddAsync(newBill);
                     await _unitOfWork.CommitAsync();
-                    
-                    //generatedBills.Add(newBill);
+                     billDetails = new CreateBill
+                    {
+                        BillTypeId = newBill.BillTypeId,
+                        BillTypeName = billType.Name,
+                        UserId = newBill.UserId,
+                        TotalAmount = newBill.TotalAmount
+                    };
+                     //newMonthBills.Add(billDetails);
                 }
                 else
                 {
@@ -196,32 +251,59 @@ namespace Application.Service
                             };
                             await _genericRepo.AddAsync(newBill);
                             await _unitOfWork.CommitAsync();
-                            //generatedBills.Add(newBill);
+                             billDetails = new CreateBill
+                            {
+                                BillTypeId = newBill.BillTypeId,
+                                BillTypeName = billType.Name,
+                                UserId = newBill.UserId,
+                                TotalAmount = newBill.TotalAmount
+                            };
+
+                             //newMonthBills.Add(billDetails);
+                        }
+
+                        else if (months == 0)
+                        {
+                            decimal Amount = 0;
+                            Amount = billType.DefaultAmount;
+                           
+                             billDetails = new CreateBill
+                            {
+                                BillTypeId = billType.Id,
+                                BillTypeName = billType.Name,
+                                UserId = userId,
+                                TotalAmount = Amount
+                            };
+                            //newMonthBills.Add(billDetails);
                         }
                     }
-                    else
+                    else if (!billType.IsFixedAmount)
                     {
                         if (months == 0)
                         {
                             decimal Amount = 0;
                             Amount = latestBill.TotalAmount;
-                            newBill = new Bill
+                            
+                             billDetails = new CreateBill
                             {
                                 BillTypeId = billType.Id,
+                                BillTypeName = billType.Name,
                                 UserId = userId,
-                                TotalAmount = Amount,
-                                //BillingMonth = month,
-                                //BillingYear = year,
-                                //NextGenerateDate = new DateTime(latestBill.BillingYear, latestBill.BillingMonth, 1)
-                                //       .AddMonths(billType.interval+1)
+                                TotalAmount = Amount
                             };
 
-                            //generatedBills.Add(newBill);
+                            //newMonthBills.Add(billDetails);
+                        }
+                        else if (months != 0)
+                        {
+                            throw new ArgumentException("Add Other Bills before generate Bills");
                         }
                     }
                 }
 
-                if (newBill != null)
+
+
+                if (billDetails != null)
                 {
                     DateTime previousMonthDate = DateTime.Now.AddMonths(-1);
                     int PYear = previousMonthDate.Year;
@@ -236,21 +318,52 @@ namespace Application.Service
                     var dto = new CreateBill
                     {
                         //Id = newBill.Id,
-                        BillTypeId = newBill.BillTypeId,
-                        //BillTypeName = billType.Name,
-                        UserId = newBill.UserId,
-                        TotalAmount = newBill.TotalAmount,
+                        BillTypeId = billDetails.BillTypeId,
+                        
+                        BillTypeName = billDetails.BillTypeName,
+                        UserId = billDetails.UserId,
+                        TotalAmount = billDetails.TotalAmount,
                         //IsPaid = newBill.IsPaid,
                         //PaidAt = newBill.PaidAt,
                         BillingMonth = PMonth,
                         BillingYear = PYear,
-                        CreatedAt = newBill.CreatedAt,
+                        //CreatedAt = billDetails.CreatedAt,
                         //NextGenerateDate = newBill.NextGenerateDate
                     };
-                    generatedBills.Add(dto);
+                    newMonthBills.Add(dto);
                 }
+
             }
-            return generatedBills;
+
+            return new BillSummaryDto
+            {
+                PreviousBills = previousMonthBills,
+                NewBills = newMonthBills
+            };
+        }
+
+
+
+
+
+
+
+
+
+        public async Task<IEnumerable<CreateBill>> GetUnpaidUserBill(string userId)
+        {
+            var unpaid = await _billRepo.GetAllUnpaidBillAsync(userId);
+            var unpaidBills = unpaid.Select(x => new CreateBill
+            {
+                BillTypeId = x.BillTypeId,
+                UserId = x.UserId,
+                TotalAmount = x.TotalAmount,
+                BillingMonth = x.CreatedAt.HasValue ? x.CreatedAt.Value.Month : 0,
+                BillingYear = x.CreatedAt.HasValue ? x.CreatedAt.Value.Year : 0,
+
+            });
+            return unpaidBills;
+
         }
 
 
