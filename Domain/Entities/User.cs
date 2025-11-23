@@ -19,10 +19,11 @@ namespace Domain.Entities
         public ICollection<WaterBill> WaterBill { get; set; }
         public ICollection<ElectricityBill> ElectricityBill { get; set; }
         public ICollection<Bill> Bills { get; set; }
-
         public Guid? OrganizationId { get; set; }
         public Organization Organization { get; set; }
         public ICollection<PaymentTransaction> PaymentTransaction { get; set; } = new List<PaymentTransaction>();
+        public List<string> Roles { get; set; } = new List<string>();
+        //public Role Roles { get; set; }
 
     }
 

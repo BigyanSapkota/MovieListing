@@ -7,6 +7,7 @@ using Application.Interface;
 using Application.Interface.Repository;
 using Application.Interface.Services;
 using Application.Service;
+using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Infrastructure.Service;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,9 @@ namespace Infrastructure.Dependency
 
         public static IServiceCollection AddInfrastructureService(this IServiceCollection Services)
         {
+            Services.AddSingleton<DapperContext>();
+            Services.AddScoped<IUserDapperRepo, UserDapperRepo>();
+            Services.AddScoped<IUserDapperService, UserDapperService>();
 
             Services.AddScoped<IGoogleAuthRepo, GoogleAuthRepo>();
 
